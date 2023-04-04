@@ -44,7 +44,7 @@ def finetune_get(ftid):
     pprint(resp.json())
 
 
-
+ft_model=input("Unesi ime modela: ")
 resp = file_upload('plots.jsonl')
-finetune_model(resp['id'], 'plot_generator', 'davinci')
-#finetune_list()
+finetune_model(resp['id'], ft_model, 'davinci')
+print(finetune_list())

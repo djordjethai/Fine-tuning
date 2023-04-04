@@ -1,6 +1,7 @@
 import os
 import json
 
+# cita promptove i odgovore i smesta ih u JSON za fine-tuning
 
 src_dir = 'completions/'
 prompt_dir = 'prompts/'
@@ -19,7 +20,7 @@ if __name__ == '__main__':
         prompt = open_file(prompt_dir + file)
         info = {'prompt': prompt, 'completion': completion}
         data.append(info)
-    with open('plots.jsonl', 'w') as outfile:
+    with open('plots.jsonl', 'w', encoding='utf-8') as outfile:
         for i in data:
             json.dump(i, outfile)
             outfile.write('\n')

@@ -1,0 +1,15 @@
+Valid fine tuned models:
+Model no 1
+davinci
+davinci:ft-djordje:plot-generator-2023-03-19-14-44-55
+succeeded
+
+Model no 2
+davinci
+davinci:ft-djordje:plot-generator-2023-04-02-13-33-54
+succeeded
+
+Model no 3
+davinci
+davinci:ft-djordje:plot-generator-2023-04-02-14-03-44
+succeeded

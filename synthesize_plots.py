@@ -16,45 +16,36 @@ def save_file(filepath, content):
 openai.api_key = open_file('openaiapikey.txt')
 
 genres = [
-    'romance & comedy',
-    'crime & mystery',
-    'action & adventure',
-    'high fantasy',
-    'science fiction',
-    'horror & thriller'
+    'interior painting',
+    'exterior painting',
+    'deck painting',
+    'kitchen caninet refinishing',
+    'door painting'
 ]
 
 modifiers = [
-    'cerebral & suspenseful',
-    'heartwarming & lighthearted',
-    'tragic & heartwrenching',
-    'supernatural & otherworldly',
-    'action-packed & exciting',
-    'gritty & dark',
+    'jurnalistic',
+    'funny',
+    'factual',
+    'emotional',
+    'optimistic'
 ]
 
 places = [
-    'France',
-    'Japan',
-    'England',
-    'America',
-    'South Africa',
-    'India',
-    'China',
-    'Egypt',
-    'Italy'
+    'Burien',
+    'Bonney Lake',
+    'Renton',
+    'Newcastle'
 ]
 
 periods = [
-    'the Renaissance',
-    'the 1920s',
-    'the 1960s',
-    'the 1990s',
-    'the near future',
-    'the distant future',
+    'Autumn',
+    'Spring',
+    'Summer',
+    'Winter'
 ]
 
-def gpt3_completion(prompt, engine='text-davinci-002', temp=1.0, top_p=1.0, tokens=1000, freq_pen=0.0, pres_pen=0.0, stop=['asdfasdf', 'asdasdf']):
+def gpt3_completion(prompt, engine='text-davinci-002', temp=0.7, top_p=1.0, tokens=1000, freq_pen=0.0, pres_pen=0.0, stop=['asdfasdf', 'asdasdf']):
     max_retry = 5
     retry = 0
     prompt = prompt.encode(encoding='ASCII',errors='ignore').decode()

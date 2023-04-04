@@ -1,5 +1,11 @@
-__pycache__/
-raven-344415-9022e591d003.json
 openaiapikey.txt
-gpt3_logs/
-memories/
+pinecone.txt
+*.json
+*.exe
+*.mp3
+*.pdf
+*.docx
+*.vsidx
+.wsuo
+slnx.sqlite
+*.csv
