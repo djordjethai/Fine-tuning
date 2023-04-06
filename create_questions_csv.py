@@ -1,16 +1,12 @@
 import openai
 import csv
+import sys
+sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
+import my_functions
 
-def open_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as infile:
-        return infile.read()
 
-def save_file(filepath, content):
-    with open(filepath, 'w', encoding='utf-8') as outfile:
-        outfile.write(content)
-
-# Set up OpenAI API credentials
-openai.api_key = open_file('openaiapikey.txt')
+# Read OpenAI API key from file
+openai.api_key = my_functions.open_file('openaiapikey.txt')
 
 # Define a function to generate a question from a text prompt
 def generate_question(prompt):

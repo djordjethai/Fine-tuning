@@ -1,50 +1,24 @@
-import requests
+import sys
 import openai
-from pprint import pprint
+import os
+sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
+import my_functions
 
-
-with open('openaiapikey.txt', 'r') as infile:
-    open_ai_api_key = infile.read()
-openai.api_key = open_ai_api_key
-
-
-def file_upload(filename, purpose='fine-tune'):
-    resp = openai.File.create(purpose=purpose, file=open(filename))
-    pprint(resp)
-    return resp
-
-
-def file_list():
-    resp = openai.File.list()
-    pprint(resp)
-
-
-def finetune_model(fileid, suffix, model='davinci'):
-    header = {'Content-Type': 'application/json', 'Authorization': 'Bearer %s' % open_ai_api_key}
-    payload = {'training_file': fileid, 'model': model, 'suffix': suffix}
-    resp = requests.request(method='POST', url='https://api.openai.com/v1/fine-tunes', json=payload, headers=header, timeout=45)
-    pprint(resp.json())
-
-
-def finetune_list():
-    header = {'Content-Type': 'application/json', 'Authorization': 'Bearer %s' % open_ai_api_key}
-    resp = requests.request(method='GET', url='https://api.openai.com/v1/fine-tunes', headers=header, timeout=45)
-    pprint(resp.json())
-
-
-def finetune_events(ftid):
-    header = {'Content-Type': 'application/json', 'Authorization': 'Bearer %s' % open_ai_api_key}
-    resp = requests.request(method='GET', url='https://api.openai.com/v1/fine-tunes/%s/events' % ftid, headers=header, timeout=45)    
-    pprint(resp.json())
-
-
-def finetune_get(ftid):
-    header = {'Content-Type': 'application/json', 'Authorization': 'Bearer %s' % open_ai_api_key}
-    resp = requests.request(method='GET', url='https://api.openai.com/v1/fine-tunes/%s' % ftid, headers=header, timeout=45)    
-    pprint(resp.json())
-
+openai.api_key = my_functions.open_file('openaiapikey.txt')
+open_ai_api_key = os.getenv(openai.api_key)
 
 ft_model=input("Unesi ime modela: ")
-resp = file_upload('plots.jsonl')
-finetune_model(resp['id'], ft_model, 'davinci')
-print(finetune_list())
+resp = my_functions.file_upload('plots.jsonl')
+my_functions.finetune_model(resp['id'], ft_model, 'davinci')
+
+# List all finetuned models
+print(my_functions.finetune_list())
+
+# Get user input for finetuned model ID
+ft_id = input("Unesi ID finetune-a: ")
+
+# Get events for finetuned model
+print(my_functions.finetune_events(ft_id))
+
+# Get details for finetuned model
+print(my_functions.finetune_get(ft_id))

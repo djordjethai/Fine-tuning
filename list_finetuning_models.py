@@ -1,12 +1,14 @@
 import os
 import openai
 import datetime
+import sys
+sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
+import my_functions
 
-def open_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as infile:
-        return infile.read()
 
-openai.api_key = open_file('openaiapikey.txt')
+# Read OpenAI API key from file
+openai.api_key = my_functions.open_file('openaiapikey.txt')
+
 open_ai_api_key = os.getenv(openai.api_key)
 # print(openai.FineTune.list())
 response = openai.FineTune.list()   
