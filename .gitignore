@@ -1,11 +1,11 @@
-openaiapikey.txt
-pinecone.txt
+*.txt
 *.json
 *.exe
 *.mp3
 *.pdf
 *.docx
-*.vsidx
+.vsidx
 .wsuo
-slnx.sqlite
 *.csv
+*.xlsx
+slnx.sqlite
