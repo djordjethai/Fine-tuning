@@ -16,190 +16,210 @@ import openai
 
 
 # Next, we specify the data path and open the JSONL file
-data_path = "miljan.jsonl"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+glavni_izbor = input(
+    "Odaberi akciju: 1. Verify data 2. Create FT model 3. Utils: ")
 
-# Load dataset
-with open(data_path) as f:
-    dataset = [json.loads(line) for line in f]
+if glavni_izbor == "1":
 
-# We can inspect the data quickly by checking the number of examples and the first item
+    data_path = input("Unesi ime fajla bez JSONL nastavka: ")
+    data_p = f"{data_path}.JSONL"
+    # Load dataset
+    with open(data_p, encoding="utf-8") as f:
+        dataset = [json.loads(line) for line in f]
 
-# Initial dataset stats
-print("Num examples:", len(dataset))
-print("First example:")
-for message in dataset[0]["messages"]:
-    print(message)
+    # We can inspect the data quickly by checking the number of examples and the first item
 
-# Now that we have a sense of the data, we need to go through all the different examples
-# and check to make sure the formatting is correct and matches the Chat completions message structure
+    # Initial dataset stats
+    print("Num examples:", len(dataset))
+    print("First example:")
+    for message in dataset[0]["messages"]:
+        print(message)
 
-# Format error checks
-format_errors = defaultdict(int)
+    # Now that we have a sense of the data, we need to go through all the different examples
+    # and check to make sure the formatting is correct and matches the Chat completions message structure
 
-for ex in dataset:
-    if not isinstance(ex, dict):
-        format_errors["data_type"] += 1
-        continue
+    # Format error checks
+    format_errors = defaultdict(int)
 
-    messages = ex.get("messages", None)
-    if not messages:
-        format_errors["missing_messages_list"] += 1
-        continue
+    for ex in dataset:
+        if not isinstance(ex, dict):
+            format_errors["data_type"] += 1
+            continue
 
-    for message in messages:
-        if "role" not in message or "content" not in message:
-            format_errors["message_missing_key"] += 1
+        messages = ex.get("messages", None)
+        if not messages:
+            format_errors["missing_messages_list"] += 1
+            continue
 
-        if any(k not in ("role", "content", "name") for k in message):
-            format_errors["message_unrecognized_key"] += 1
+        for message in messages:
+            if "role" not in message or "content" not in message:
+                format_errors["message_missing_key"] += 1
 
-        if message.get("role", None) not in ("system", "user", "assistant"):
-            format_errors["unrecognized_role"] += 1
+            if any(k not in ("role", "content", "name") for k in message):
+                format_errors["message_unrecognized_key"] += 1
 
-        content = message.get("content", None)
-        if not content or not isinstance(content, str):
-            format_errors["missing_content"] += 1
+            if message.get("role", None) not in ("system", "user", "assistant"):
+                format_errors["unrecognized_role"] += 1
 
-    if not any(message.get("role", None) == "assistant" for message in messages):
-        format_errors["example_missing_assistant_message"] += 1
+            content = message.get("content", None)
+            if not content or not isinstance(content, str):
+                format_errors["missing_content"] += 1
 
-if format_errors:
-    print("Found errors:")
-    for k, v in format_errors.items():
-        print(f"{k}: {v}")
-else:
-    print("No errors found")
+        if not any(message.get("role", None) == "assistant" for message in messages):
+            format_errors["example_missing_assistant_message"] += 1
 
-# Beyond the structure of the message, we also need to ensure that the length does not exceed the 4096 token limit.
+    if format_errors:
+        print("Found errors:")
+        for k, v in format_errors.items():
+            print(f"{k}: {v}")
+    else:
+        print("No errors found")
 
-# Token counting functions
-encoding = tiktoken.get_encoding("cl100k_base")
+    # Beyond the structure of the message, we also need to ensure that the length does not exceed the 4096 token limit.
 
-# not exact!
-# simplified from https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
+    # Token counting functions
+    encoding = tiktoken.get_encoding("cl100k_base")
 
+    def num_tokens_from_messages(messages, tokens_per_message=3, tokens_per_name=1):
+        num_tokens = 0
+        for message in messages:
+            num_tokens += tokens_per_message
+            for key, value in message.items():
+                num_tokens += len(encoding.encode(value))
+                if key == "name":
+                    num_tokens += tokens_per_name
+        num_tokens += 3
+        return num_tokens
 
-def num_tokens_from_messages(messages, tokens_per_message=3, tokens_per_name=1):
-    num_tokens = 0
-    for message in messages:
-        num_tokens += tokens_per_message
-        for key, value in message.items():
-            num_tokens += len(encoding.encode(value))
-            if key == "name":
-                num_tokens += tokens_per_name
-    num_tokens += 3
-    return num_tokens
+    def num_assistant_tokens_from_messages(messages):
+        num_tokens = 0
+        for message in messages:
+            if message["role"] == "assistant":
+                num_tokens += len(encoding.encode(message["content"]))
+        return num_tokens
 
+    def print_distribution(values, name):
+        print(f"\n#### Distribution of {name}:")
+        print(f"min / max: {min(values)}, {max(values)}")
+        print(f"mean / median: {np.mean(values)}, {np.median(values)}")
+        print(
+            f"p5 / p95: {np.quantile(values, 0.1)}, {np.quantile(values, 0.9)}")
 
-def num_assistant_tokens_from_messages(messages):
-    num_tokens = 0
-    for message in messages:
-        if message["role"] == "assistant":
-            num_tokens += len(encoding.encode(message["content"]))
-    return num_tokens
+    # Last, we can look at the results of the different formatting operations before proceeding with creating a fine-tuning job:
 
+    # Warnings and tokens counts
+    n_missing_system = 0
+    n_missing_user = 0
+    n_messages = []
+    convo_lens = []
+    assistant_message_lens = []
 
-def print_distribution(values, name):
-    print(f"\n#### Distribution of {name}:")
-    print(f"min / max: {min(values)}, {max(values)}")
-    print(f"mean / median: {np.mean(values)}, {np.median(values)}")
-    print(f"p5 / p95: {np.quantile(values, 0.1)}, {np.quantile(values, 0.9)}")
+    for ex in dataset:
+        messages = ex["messages"]
+        if not any(message["role"] == "system" for message in messages):
+            n_missing_system += 1
+        if not any(message["role"] == "user" for message in messages):
+            n_missing_user += 1
+        n_messages.append(len(messages))
+        convo_lens.append(num_tokens_from_messages(messages))
+        assistant_message_lens.append(
+            num_assistant_tokens_from_messages(messages))
 
-# Last, we can look at the results of the different formatting operations before proceeding with creating a fine-tuning job:
+    print("Num examples missing system message:", n_missing_system)
+    print("Num examples missing user message:", n_missing_user)
+    print_distribution(n_messages, "num_messages_per_example")
+    print_distribution(convo_lens, "num_total_tokens_per_example")
+    print_distribution(assistant_message_lens,
+                       "num_assistant_tokens_per_example")
+    n_too_long = sum(l > 4096 for l in convo_lens)
+    print(f"\n{n_too_long} examples may be over the 4096 token limit, they will be truncated during fine-tuning")
 
+    # Pricing and default n_epochs estimate
+    MAX_TOKENS_PER_EXAMPLE = 4096
 
-# Warnings and tokens counts
-n_missing_system = 0
-n_missing_user = 0
-n_messages = []
-convo_lens = []
-assistant_message_lens = []
+    MIN_TARGET_EXAMPLES = 100
+    MAX_TARGET_EXAMPLES = 25000
+    TARGET_EPOCHS = 3
+    MIN_EPOCHS = 1
+    MAX_EPOCHS = 25
 
-for ex in dataset:
-    messages = ex["messages"]
-    if not any(message["role"] == "system" for message in messages):
-        n_missing_system += 1
-    if not any(message["role"] == "user" for message in messages):
-        n_missing_user += 1
-    n_messages.append(len(messages))
-    convo_lens.append(num_tokens_from_messages(messages))
-    assistant_message_lens.append(num_assistant_tokens_from_messages(messages))
+    n_epochs = TARGET_EPOCHS
+    n_train_examples = len(dataset)
+    if n_train_examples * TARGET_EPOCHS < MIN_TARGET_EXAMPLES:
+        n_epochs = min(MAX_EPOCHS, MIN_TARGET_EXAMPLES // n_train_examples)
+    elif n_train_examples * TARGET_EPOCHS > MAX_TARGET_EXAMPLES:
+        n_epochs = max(MIN_EPOCHS, MAX_TARGET_EXAMPLES // n_train_examples)
 
-print("Num examples missing system message:", n_missing_system)
-print("Num examples missing user message:", n_missing_user)
-print_distribution(n_messages, "num_messages_per_example")
-print_distribution(convo_lens, "num_total_tokens_per_example")
-print_distribution(assistant_message_lens, "num_assistant_tokens_per_example")
-n_too_long = sum(l > 4096 for l in convo_lens)
-print(f"\n{n_too_long} examples may be over the 4096 token limit, they will be truncated during fine-tuning")
+    n_billing_tokens_in_dataset = sum(
+        min(MAX_TOKENS_PER_EXAMPLE, length) for length in convo_lens)
+    print(
+        f"Dataset has ~{n_billing_tokens_in_dataset} tokens that will be charged for during training")
+    print(f"By default, you'll train for {n_epochs} epochs on this dataset")
+    print(
+        f"By default, you'll be charged for ~{n_epochs * n_billing_tokens_in_dataset} tokens")
+    print("See pricing page to estimate total costs")
 
-# Pricing and default n_epochs estimate
-MAX_TOKENS_PER_EXAMPLE = 4096
-
-MIN_TARGET_EXAMPLES = 100
-MAX_TARGET_EXAMPLES = 25000
-TARGET_EPOCHS = 3
-MIN_EPOCHS = 1
-MAX_EPOCHS = 25
-
-n_epochs = TARGET_EPOCHS
-n_train_examples = len(dataset)
-if n_train_examples * TARGET_EPOCHS < MIN_TARGET_EXAMPLES:
-    n_epochs = min(MAX_EPOCHS, MIN_TARGET_EXAMPLES // n_train_examples)
-elif n_train_examples * TARGET_EPOCHS > MAX_TARGET_EXAMPLES:
-    n_epochs = max(MIN_EPOCHS, MAX_TARGET_EXAMPLES // n_train_examples)
-
-n_billing_tokens_in_dataset = sum(
-    min(MAX_TOKENS_PER_EXAMPLE, length) for length in convo_lens)
-print(
-    f"Dataset has ~{n_billing_tokens_in_dataset} tokens that will be charged for during training")
-print(f"By default, you'll train for {n_epochs} epochs on this dataset")
-print(
-    f"By default, you'll be charged for ~{n_epochs * n_billing_tokens_in_dataset} tokens")
-print("See pricing page to estimate total costs")
-
-
-##############################################################################################################
+    ##############################################################################################################
 
 
-nastavak = input("Da li da nastavin sa procedurom? (DA/ne) ")
-
-if nastavak == "DA":
+elif glavni_izbor == "2":
     # Upload fine tuning data
-    openai.File.create(
-        file=open("miljan.jsonl", "rb"),
+    izvor = input("Unesi izvorni fajl JSONL: ")
+    # training_file validation name
+    ft_model_validation = input("Unesi ime fajla za validaciju: ")
+    suffix = input("Unesi sufiks npr. ime_stila: ")  # suffix name
+    training_resp = openai.File.create(
+        file=open(izvor, "r", encoding="utf-8"),
         purpose='fine-tune'
     )
+    treining_file_id = training_resp.id
+    validation_resp = openai.File.create(
+        file=open(ft_model_validation, "r", encoding="utf-8"),
+        purpose='fine-tune'
+    )
+    validation_file_id = validation_resp.id
+    print("Training file id: ", treining_file_id)
+    print("Validation file id: ", validation_file_id)
 
-    # model name will be like
-    # model="ft:gpt-3.5-turbo:my-org:custom_suffix:id"
-    # we might need this data
+    input("Wait a bit and then press any key to continue... ")
     # openai.organization = "org-77SVjL6mRtS5U57fDU1w1T2z"
-    # openai.api_key = os.getenv("OPENAI_API_KEY")
-    # openai.Model.list()
 
-    #######
     # Creating a model
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    openai.FineTuningJob.create(
-        training_file="file-abc123", model="gpt-3.5-turbo")
 
-    #######
+    ft_job = openai.FineTuningJob.create(
+        training_file=treining_file_id,
+        validation_file=validation_file_id,
+        model="gpt-3.5-turbo",
+        suffix=suffix
+    )
 
+    print("Fine tuning job id: ", ft_job.id)
     # additional tasks
+else:
 
-    # List 10 fine-tuning jobs
-    openai.FineTuningJob.list(limit=10)
+    def ft_utils():
+        print("Unesi model i odaberi opciju - ")
+        ft_model = input("Unesi model: ")
+        izbor = input(
+            "Odaberi akciju: 1. List 10 FT jobs 2. Retrieve the state of a FT 3. Cancel a job 4. List up to 20 events from a FT job 5. Delete FT model 6. Model list: ")
 
-    # Retrieve the state of a fine-tune
-    openai.FineTuningJob.retrieve("ft-abc123")
-
-    # Cancel a job
-    openai.FineTuningJob.cancel("ft-abc123")
-
-    # List up to 10 events from a fine-tuning job
-    openai.FineTuningJob.list_events(id="ft-abc123", limit=10)
-
-    # Delete a fine-tuned model (must be an owner of the org the model was created in)
-    import openai
-    openai.Model.delete("ft-abc123")
+        if izbor == "1":
+            # List 10 fine-tuning jobs
+            job = openai.FineTuningJob.list(limit=10)
+        elif izbor == "2":
+            # Retrieve the state of a fine-tune
+            job = openai.FineTuningJob.retrieve(ft_model)
+        elif izbor == "3":
+            # Cancel a job
+            openai.FineTuningJob.cancel(ft_model)
+        elif izbor == "4":
+            # List up to 10 events from a fine-tuning job
+            job = openai.FineTuningJob.list_events(id=ft_model, limit=50)
+        elif izbor == "5":
+            # Delete a fine-tuned model (must be an owner of the org the model was created in)
+            job = openai.Model.delete(ft_model)
+        elif izbor == "6":
+            job = openai.Model.list()
+        print(job)
+    ft_utils()

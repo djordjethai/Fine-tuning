@@ -1,2 +1,0 @@
-<<UUID>>
-Write 200 words blog post for a <<GENRE>> delivred in <<PLACE>> city during <<PERIOD>>. The blog post should be written in <<MODIFIER>> tone, in English language. Write using an active voice, short sentences and short paragraps. Include subtitles:
