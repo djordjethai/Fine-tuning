@@ -1,9 +1,10 @@
+# ne korastiti ovaj kod, vec koristiti noviji, za Chat Modele
+import my_functions
 import openai
-from time import time,sleep
+from time import time, sleep
 from uuid import uuid4
 import sys
 sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
-import my_functions
 
 
 # Read OpenAI API key from file
@@ -39,10 +40,11 @@ periods = [
     'Winter'
 ]
 
+
 def gpt3_completion(prompt, engine='text-davinci-002', temp=0.7, top_p=1.0, tokens=1000, freq_pen=0.0, pres_pen=0.0, stop=['asdfasdf', 'asdasdf']):
     max_retry = 5
     retry = 0
-    prompt = prompt.encode(encoding='ASCII',errors='ignore').decode()
+    prompt = prompt.encode(encoding='ASCII', errors='ignore').decode()
     while True:
         try:
             response = openai.Completion.create(
@@ -55,9 +57,10 @@ def gpt3_completion(prompt, engine='text-davinci-002', temp=0.7, top_p=1.0, toke
                 presence_penalty=pres_pen,
                 stop=stop)
             text = response['choices'][0]['text'].strip()
-            #text = re.sub('\s+', ' ', text)
+            # text = re.sub('\s+', ' ', text)
             filename = '%s_gpt3.txt' % time()
-            my_functions.save_file('gpt3_logs/%s' % filename, prompt + '\n\n==========\n\n' + text)
+            my_functions.save_file('gpt3_logs/%s' %
+                                   filename, prompt + '\n\n==========\n\n' + text)
             return text
         except Exception as oops:
             retry += 1
@@ -82,12 +85,15 @@ if __name__ == '__main__':
                     prompt = prompt.replace('<<UUID>>', str(uuid4()))
                     print('\n\n', prompt)
                     completion = gpt3_completion(prompt)
-                    outprompt = 'Genre: %s\nLocation: %s\nPeriod: %s\nModifier: %s\n\nPLOT OUTLINE: ' % (genre, place, period, modifier)
-                    filename = (place + period + genre + modifier).replace(' ','').replace('&','') + '%s.txt' % time()
+                    outprompt = 'Genre: %s\nLocation: %s\nPeriod: %s\nModifier: %s\n\nPLOT OUTLINE: ' % (
+                        genre, place, period, modifier)
+                    filename = (place + period + genre + modifier).replace(' ',
+                                                                           '').replace('&', '') + '%s.txt' % time()
                     my_functions.save_file('prompts/%s' % filename, outprompt)
-                    my_functions.save_file('completions/%s' % filename, completion)
+                    my_functions.save_file(
+                        'completions/%s' % filename, completion)
                     print('\n\n', outprompt)
                     print('\n\n', completion)
                     if count > 500:
                         exit()
-    #print(count)
+    # print(count)

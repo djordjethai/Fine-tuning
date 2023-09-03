@@ -1,9 +1,10 @@
+# ne korastiti ovaj kod, vec koristiti noviji, za Chat Modele
 # Import necessary libraries
+import my_functions
 import openai
 import os
 import sys
 sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
-import my_functions
 
 
 # Read OpenAI API key from file
@@ -11,7 +12,7 @@ openai.api_key = my_functions.open_file('openaiapikey.txt')
 open_ai_api_key = os.getenv(openai.api_key)
 
 # Get user input for model name
-ft_model=input("Unesi ime modela: ")
+ft_model = input("Unesi ime modela: ")
 
 # Upload file and finetune model
 resp = my_functions.file_upload('plots.jsonl')

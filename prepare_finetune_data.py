@@ -1,8 +1,9 @@
+# ne korastiti ovaj kod, vec koristiti noviji, za Chat Modele
+import my_functions
 import os
 import json
 import sys
 sys.path.insert(0, r'C:\Users\djordje\PythonGPT3Tutorial')
-import my_functions
 
 # cita promptove i odgovore i smesta ih u JSON za fine-tuning
 
