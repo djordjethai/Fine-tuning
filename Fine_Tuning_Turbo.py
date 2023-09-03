@@ -33,7 +33,9 @@ ft_model = None
 def main():
     def intro():
         st.subheader("Fine Tuning Turbo Modela")
-        st.caption("App kreira FT model")
+        with st.expander("Procitajte uputstvo:"):
+            st.caption(
+                "App kreira FT model. Ovde ce ici kompletno uputstvo kako se radi sa svakom opcijom. ")
 
         with st.sidebar:
             st.image(
@@ -53,14 +55,15 @@ def main():
 
     }
 
-    demo_name = st.sidebar.selectbox("Choose App", page_names_to_funcs.keys())
+    demo_name = st.sidebar.selectbox("Choose App", page_names_to_funcs.keys(
+    ), help="Odaberite operaciju u vezi FT Modela")
     page_names_to_funcs[demo_name]()
 
 
 def verify_data():
 
     data_path = st.file_uploader(
-        "Izaberite JSONL fajl za verifikaciju", key="upload_verifikacije", type='JSONL')
+        "Izaberite JSONL fajl za verifikaciju", key="upload_verifikacije", type='JSONL', help="JSONL file sa pitanjima i odgovorima")
 
     if data_path is not None:
         data_p = data_path.name
@@ -208,20 +211,20 @@ def verify_data():
 def create_ft_model():
     # Upload fine tuning data
     data_path = st.file_uploader(
-        "Izaberite JSONL fajl za kreiranje FT modela", key="upload_modela", type='JSONL')
+        "Izaberite JSONL fajl za kreiranje FT modela", key="upload_modela", type='JSONL', help="JSONL file sa pitanjima i odgovorima za trening")
 
     if data_path is not None:
         izvor = data_path.name
 
     # training_file validation name
         ver_path = st.file_uploader(
-            "Izaberite JSONL fajl za kreiranje FT modela", key="upload_ver", type='JSONL')
+            "Izaberite JSONL fajl za kreiranje FT modela", key="upload_ver", type='JSONL', help="JSONL file sa pitanjima i odgovorima za verifikaciju")
 
         if ver_path is not None:
             ft_model_validation = ver_path.name
 
             suffix = st.text_input(
-                "Unesi sufiks npr. ime_stila: ")  # suffix name
+                "Unesi sufiks npr. ime_stila: ", help="Ime modela po kojem cete ga prepoznati")  # suffix name
 
             training_resp = openai.File.create(
                 file=open(izvor, "r", encoding="utf-8"),
@@ -256,7 +259,8 @@ def create_ft_model():
 
 def ft_utils():
 
-    ft_model = st.text_input("Unesi ime FT modela ili Job-a: ")
+    ft_model = st.text_input("Unesi ime FT modela ili Job-a: ",
+                             help="U zavisnosti od opcije unesite ime FT modela ili FT Job-a")
     if ft_model is None or ft_model == " " or ft_model == "":
         st.info("Unesi ime FT modela")
         return None
