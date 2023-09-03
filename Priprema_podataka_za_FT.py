@@ -24,23 +24,26 @@ st.markdown(
 
 
 def main():
-    st.subheader('Fine Tuning')  # Setting the title for Streamlit application
-    st.info(
-        'Aplikacija priprema Fine Tuning podatke za GPT-3.5 Turbo model. Za vise informacija pogledajte dokumentaciju.')
-    st.caption("Prvi korak je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Drugi korak je bio da u fajlu input.txt rucno odgovorimo na sva pitanja. ili da se odgovori izvuku iz dokumenta. Trece faza je da se dodatni odgovori kreiraju u ovom programu.")
-
+    # Setting the title for Streamlit application
+    st.subheader('Priprema Fine Tuning trening i verification fajlova')
+    with st.expander("Procitajte uputstvo:"):
+        st.caption("Prethodni korak bio je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Na pitanja mozemo da odgovorimo sami ili se odgovori mogu izvuci iz dokumenta.")
+        st.caption("Ukoliko zelite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponasanja modela) i naziv FT modela. Kliknite na Submit i sacekajte da se obrada zavrsi. Fajl sa odgovorima cete kasnije korisiti za kreiranje FT modela.")
+        st.caption(
+            "Pre prelaska na sledecu fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi. ")
     openai.api_key = os.getenv("OPENAI_API_KEY")
     model, temp = init_cond_llm()
     with st.sidebar:
         input_file_path = st.file_uploader(
-            "Izaberite fajl sa pitanjima", key="upload_pitanja", type='txt')
+            "Izaberite fajl sa pitanjima", key="upload_pitanja", type='txt', help="Pitanja koje ste sastavili u prethodnom koraku.")
 
         source_file_path = st.file_uploader(
-            "Izaberite fajl sa izvorom (ako postoji)", key="upload_izvor", type='txt')
+            "Izaberite fajl sa izvorom (ako postoji)", key="upload_izvor", type='txt', help="Fajl koje zelita da vam bude izvor informacija za odgovore.")
 
         if input_file_path is not None:
             # Loading text from the file
             pitanje = open_file(input_file_path.name)
+
         if source_file_path is not None:
             # Loading text from the file
             prompt_source = open_file(source_file_path.name)
@@ -50,10 +53,11 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
         with st.form(key='my_form'):
-            system_message = st.text_area("Unesite sistemsku poruku: ")
-            izvor = st.text_input("Unesite naziv FT modela:")
-            output_file_path = st.text_input(
-                "Unesite puno ime fajla za odgovore:")
+            system_message = st.text_area(
+                "Unesite sistemsku poruku: ", help="Opisite ponasanje i stil modela. Ukljucite i ime")
+            izvor = st.text_input("Unesite naziv FT modela:",
+                                  help="Dajte ime modelu koji kreirate")
+            output_file_path = f"{izvor}_odg.txt"
             submit_button = st.form_submit_button(label='Submit')
 
     with col2:
