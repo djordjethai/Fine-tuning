@@ -1,3 +1,0 @@
-
-
-Da li je bolje osnovati posebnu kontroling službu zbog obima zadataka i višestrukih koristi koje donosi?

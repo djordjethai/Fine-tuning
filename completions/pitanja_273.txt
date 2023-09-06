@@ -1,1 +1,0 @@
-Master rad Djordje Medakovic prva generacija sistema bazirala se na jednostavnim bazama podataka a podaci se obranuju koristeći “excel” tabele ili slične alate 
