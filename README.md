@@ -154,5 +154,3 @@ To utilize this script and prepare your data for fine-tuning, follow these steps
 For additional information and updates, please refer to the [OpenAI documentation](https://beta.openai.com/docs/).
 
 ---
-
-You can include this introductory section at the beginning of your MD file to provide users with an understanding of the purpose and usage of the `priprema_podataka_za_ft.py` script.
