@@ -1,5 +1,5 @@
 # This code prepares and runs Fine Tuning tor Turbo OpenAi Model
-from mojafunkcja import st_style, positive_login
+from mojafunkcija import st_style, positive_login
 import json
 import os
 import tiktoken
@@ -319,4 +319,4 @@ def list_models():
     st.code(openai.Model.list())
 
 
-name, authentication_status, username = positive_login(main, "03.09.23")
+name, authentication_status, username = positive_login(main, "06.09.23")

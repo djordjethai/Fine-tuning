@@ -1,124 +1,158 @@
-#Fine-tuning demo
+# OpenAI Fine-Tuning Toolkit
 
-** prepare_fine_tune_data.py
-This Python code imports modules and functions, reads files from directories, processes them, and outputs the results in a JSON file.
+Welcome to the OpenAI Fine-Tuning Toolkit! This repository contains a collection of Python scripts (.py files) designed to streamline and simplify the fine-tuning process for OpenAI's GPT-3.5 Turbo model. Whether you're looking to fine-tune the model for specific tasks, monitor job progress, or manage fine-tuned models, this toolkit has you covered.
 
-The code begins by importing the necessary modules: os, json, and sys. The os module is used to access the operating system functionalities, while json is 
-used to encode and decode JSON objects. The sys module is used to manipulate the Python runtime environment.
+## Overview
 
-The code then inserts a path to a local Python module named my_functions, which contains custom functions that will be used later in the code.
+Fine-tuning the GPT-3.5 Turbo model allows you to customize it for various natural language understanding and generation tasks. OpenAI's fine-tuning capabilities empower you to create chatbots, provide recommendations, answer questions, and more, all tailored to your specific application.
 
-Next, the script defines two directory paths, src_dir and prompt_dir, which contain the input files that will be processed. These directories are relative 
-paths to the current working directory.
+This toolkit includes several Python scripts, each serving a specific purpose in the fine-tuning workflow. Below is an overview of the key components:
 
-The if __name__ == '__main__': block is used to define the main function of the code. Inside this block, the script first uses the os module to list all files
- in the src_dir directory.
+1. **Data Preparation:** Ensure that your training data is in the right format, within token limits, and ready for fine-tuning.
 
-Then, the script creates an empty list named data. This list will store the processed prompt and completion data.
+2. **Model Creation:** Upload your data, initiate fine-tuning, and specify model details, such as the name and organization.
 
-The script then loops through all the files in the src_dir directory. For each file, it reads the completion data using the open_file() function from the 
-my_functions module, passing the file path as an argument. It then reads the corresponding prompt data from the prompt_dir directory using the same function.
+3. **Job Management:** Keep track of fine-tuning jobs, retrieve job states, cancel ongoing jobs, and list events associated with a particular job.
 
-The script then creates a dictionary named info, which contains the prompt and completion data as key-value pairs.
+4. **Model Deletion:** Delete fine-tuned models that are no longer needed.
 
-The info dictionary is then appended to the data list.
+5. **Model Listing:** List available models for reference.
 
-After processing all files, the script writes the contents of the data list to a new file named 'plots.jsonl' using the json.dump() function, which writes the
- dictionary objects as a single line of JSON text to the output file. Each JSON object is separated by a newline character '\n'.
+## Getting Started
 
-In summary, this code reads prompt and completion data from a set of input files, processes the data, and stores the results in a JSON file for further 
-analysis or use in machine learning tasks.
-***********
+To get started with fine-tuning using this toolkit, follow these steps:
 
-** list-fune_tuning_models.py
-This code imports several libraries/modules, namely "os", "openai", "datetime", and "sys". It also imports a custom module "my_functions" located in the 
-directory "C:\Users\djordje\PythonGPT3Tutorial".
+1. Clone this repository to your local machine.
 
-The code then reads the OpenAI API key from a file called "openaiapikey.txt" using the custom function "open_file" from the "my_functions" module. The API key
- is then set to the "openai.api_key" variable.
+2. Set up your OpenAI API key by defining it as an environment variable (`OPENAI_API_KEY`). You can obtain an API key by signing up on the OpenAI platform.
 
-The "open_ai_api_key" variable is set to the value of the "openai.api_key" environment variable from the operating system.
+3. Install the required Python dependencies specified in each .py file.
 
-The code then makes a request to the OpenAI API using the "openai.FineTune.list()" method and stores the response in the "response" variable.
+4. Navigate to the specific .py file that corresponds to the task you want to perform and follow the instructions provided.
 
-The user is then prompted to input either 'd' or 'n' to choose whether they want to see a shortened list of valid fine-tuned models or a full list of all 
-fine-tuned models. The user's input is stored in the "obim" variable.
+5. Refer to the individual .py file descriptions for detailed usage guidelines.
 
-If the user enters 'd', the code prints a list of valid fine-tuned models. It iterates through the "response" variable and prints the model number, creation 
-date, model name, fine-tuned model name, and status of each valid fine-tuned model.
+## Script Descriptions
 
-If the user enters 'n', the code prints a list of all fine-tuned models. It simply prints the "response" variable.
+Below, you'll find descriptions and usage guidelines for each Python script included in this toolkit:
 
-Finally, an empty line is printed to separate the output from the command prompt.
+---
 
-***********
+Feel free to explore each script based on your specific fine-tuning needs. Whether you're new to fine-tuning or an experienced user, this toolkit aims to simplify the process and make it accessible to all.
 
-** create_questions_csv.py
+For additional information and updates, please refer to the [OpenAI documentation](https://beta.openai.com/docs/).
 
-This code begins by importing the "openai", "csv", and "sys" modules, as well as a custom module called "my_functions". The OpenAI API key is read from a file
- called "openaiapikey.txt" using the custom function "open_file" from the "my_functions" module and set to the "openai.api_key" variable.
+---
 
-Next, a function named "generate_question" is defined. This function takes a text prompt as an input, generates a question based on the prompt using the 
-OpenAI API, and returns the generated question. It uses the "openai.Completion.create()" method to generate the question using the "text-davinci-003" model 
-with specific parameters such as the prompt, temperature, max_tokens, top_p, frequency_penalty, and presence_penalty.
+## Fine-Tuning GPT-3.5 Turbo Model - `Fine_tuning_turbo.py`
 
-Then, the code opens an input CSV file called "input.csv" and creates a new CSV file to store the questions generated by the "generate_question" function. It 
-initializes a "file_counter" variable with a value of 1 to keep track of the file suffix for each question. The code then loops through each row of the input 
-CSV file and generates a question for each cell in the row. It creates a separate text file for each question with a suffix based on the "file_counter" 
-variable, writes the generated question to the text file, and increments the "file_counter" variable for the next iteration. The generated questions are 
-printed to the console as well.
+This Python script is designed to prepare and run fine-tuning for the GPT-3.5 Turbo model provided by OpenAI. It is integrated into a Streamlit web application for ease of use. The script performs various tasks related to fine-tuning, including data verification, model creation, monitoring job status, and more.
 
-Finally, the code writes each CSV line in a separate tex
+### Features and Functionality:
 
-******************
+1. **Data Verification:**
+   - Allows users to upload a JSONL file containing question-answer pairs for data verification.
+   - Checks the data structure to ensure it complies with the Chat completions message structure.
+   - Verifies the token count to ensure it does not exceed the 4096 token limit.
+   - Provides pricing and default epoch estimates based on the dataset.
 
+2. **Create Fine-Tuned Model:**
+   - Users can upload a JSONL file for creating a fine-tuned model.
+   - Validates the uploaded training and validation data files.
+   - Allows users to specify a suffix for the model's name.
+   - Initiates the fine-tuning process using the specified data and model.
 
-** finetune_comments.py
+3. **List Fine-Tuning Jobs:**
+   - Displays a list of up to 10 fine-tuning jobs.
 
-This code is written in Python and consists of several sections that use various libraries and functions to finetune an OpenAI GPT-3 model. Let's take a 
-closer look at each section:
+4. **Retrieve Fine-Tuning Job State:**
+   - Allows users to retrieve the state of a specific fine-tuning job using its ID.
 
-Import necessary libraries: This section imports the libraries that will be used in the code, including openai, os, sys, and a custom module called 
-my_functions. openai is the official OpenAI Python library, os is a module that provides a portable way of using operating system dependent functionality, sys
- is a module that provides access to some variables used or maintained by the interpreter and to functions that interact strongly with the interpreter, and 
-my_functions is a custom module created to provide some helper functions for interacting with OpenAI.
+5. **Cancel Fine-Tuning Job:**
+   - Provides an option to cancel a fine-tuning job by specifying its ID.
 
-Read OpenAI API key from file: This section reads the OpenAI API key from a file called openaiapikey.txt using a function from the my_functions module. The 
-key is stored in the openai.api_key variable.
+6. **List Events from Fine-Tuning Job:**
+   - Lists up to 50 events from a specific fine-tuning job.
 
-Get user input for model name: This section prompts the user to enter the name of the model to be finetuned.
+7. **Delete Fine-Tuned Model:**
+   - Allows users to delete a fine-tuned model using its ID (requires ownership privileges).
 
-Upload file and finetune model: This section uploads a file called plots.jsonl using a function from the my_functions module and then uses another function 
-from the same module to finetune the selected model (ft_model) with the uploaded file. The davinci engine is used for finetuning.
+8. **List Available Models:**
+   - Lists available models for reference.
 
-List all finetuned models: This section calls a function from the my_functions module to list all the finetuned models.
+### How to Use:
 
-Get user input for finetuned model ID: This section prompts the user to enter the ID of the finetuned model to retrieve events and details.
+1. Clone this repository to your local machine.
+2. Set up your OpenAI API key by defining it as an environment variable (`OPENAI_API_KEY`).
+3. Install the required dependencies specified in the code.
+4. Run the script, and it will launch a Streamlit web application.
+5. Follow the Streamlit interface to perform various fine-tuning tasks.
 
-Get events for finetuned model: This section calls a function from the my_functions module to retrieve the events for the selected finetuned model (ft_id).
+Make sure to replace `mojafunkcija`, `positive_login`, and other placeholders with relevant functions or libraries according to your project's structure.
 
-Get details for finetuned model: This section calls a function from the my_functions module to retrieve the details for the selected finetuned model (ft_id).
+For additional information and updates, please refer to the [OpenAI documentation](https://beta.openai.com/docs/).
+## Script Details
 
-********************
+- **Author**: Positive
+- **Date**: 07.09.2023
+- **License**: MIT
+---
 
-** syntesize_plots.py
+# Data Preparation for Fine-Tuning - `priprema_podataka_za_ft.py`
 
-This code imports necessary modules such as openai, time, uuid, sys, and a custom module named my_functions. The openai module is used for communicating with 
-OpenAI's GPT-3 API, while time, uuid, and sys are used for various utility purposes such as generating unique filenames and handling file paths. The custom 
-module my_functions likely contains additional utility functions and is imported to make use of its functions.
+This Python script, `priprema_podataka_za_ft.py`, is part of the OpenAI Fine-Tuning Toolkit. It serves a crucial role in the fine-tuning process for OpenAI's GPT-3.5 Turbo model by preparing the training and verification data files.
 
-After importing the necessary modules, the code defines several lists containing different values. The genres, modifiers, places, and periods lists contain 
-strings representing different categories of data. For example, the genres list contains strings representing different types of painting work. These lists 
-will be used later to generate prompts for the GPT-3 API.
+## Overview
 
-Next, the code defines a function named gpt3_completion which handles communicating with the OpenAI API and returning a response. The function takes several 
-parameters such as prompt, engine, temp, top_p, tokens, freq_pen, pres_pen, and stop, which are used to configure the behavior of the API request. The 
-function attempts to make a request to the API and returns the response text if successful. If an error occurs, the function will retry up to 5 times before 
-returning an error message.
+Fine-tuning a language model like GPT-3.5 Turbo requires well-structured and curated datasets. This script streamlines the data preparation process, allowing you to:
 
-Finally, the code enters the if __name__ == '__main__': block, which is the entry point of the script. The code iterates through every combination of 
-categories in the genres, modifiers, places, and periods lists, generating a prompt using the contents of each category. The gpt3_completion function is then 
-called with the generated prompt, and the resulting completion text is saved to a file using a unique filename based on the current time. The prompt and 
-completion text are also printed to the console for debugging purposes. The loop will stop after 500 iterations, which is likely used for testing purposes.
+- Upload a file containing questions, which may have been generated using the ChatGPT model or obtained from various sources.
+- Optionally, upload a source file if the answers need to be based on specific text.
+- Define a system message that describes the model's behavior and style, including its name.
+- Generate answers to questions using the specified system message and data.
+- Save the answers to an output file.
+- Create a JSONL file for fine-tuning with user and assistant messages.
 
-******************
+## Getting Started
+
+To utilize this script and prepare your data for fine-tuning, follow these steps:
+
+1. Clone this repository to your local machine.
+
+2. Set up your OpenAI API key by defining it as an environment variable (`OPENAI_API_KEY`). Ensure you have an API key from OpenAI's platform.
+
+3. Install the required Python dependencies specified in the script.
+
+4. Run the script, and it will launch a Streamlit web application.
+
+5. Follow the Streamlit interface to perform data preparation for fine-tuning.
+
+## Usage Guidelines
+
+1. Upload a file containing questions that require answers.
+
+2. Optionally, upload a source file if answers should be based on specific text.
+
+3. Define a system message that sets the behavior and style of the model, including its name.
+
+4. Click the "Submit" button to generate answers to questions.
+
+5. Review and, if necessary, make corrections to the generated answers.
+
+6. The script saves the answers to an output file, which you can later use for fine-tuning.
+
+7. A JSONL file is created, incorporating user and assistant messages, facilitating the fine-tuning process.
+
+8. The processed data is saved and ready for use in training a fine-tuned model.
+
+## Script Details
+
+- **Author**: Positive
+- **Date**: 07.09.2023
+- **License**: MIT
+
+For additional information and updates, please refer to the [OpenAI documentation](https://beta.openai.com/docs/).
+
+---
+
+You can include this introductory section at the beginning of your MD file to provide users with an understanding of the purpose and usage of the `priprema_podataka_za_ft.py` script.

@@ -2,10 +2,10 @@ import json
 import openai
 import os
 import streamlit as st
-from mojafunkcja import open_file, st_style, init_cond_llm, positive_login
+from mojafunkcija import open_file, st_style, init_cond_llm, positive_login
 
 st.set_page_config(
-    page_title="Fine Tuning",
+    page_title="Fine Tuning - Priprema",
     page_icon="👋",
     layout="wide"
 )
@@ -34,6 +34,8 @@ def main():
     openai.api_key = os.getenv("OPENAI_API_KEY")
     model, temp = init_cond_llm()
     with st.sidebar:
+        st.image(
+                "https://test.georgemposi.com/wp-content/uploads/2023/05/positive-logo-red.jpg", width=150)
         input_file_path = st.file_uploader(
             "Izaberite fajl sa pitanjima", key="upload_pitanja", type='txt', help="Pitanja koje ste sastavili u prethodnom koraku.")
 
@@ -135,4 +137,4 @@ def main():
                         f"Obrada je zavrsena, kreiran je fajl {jsonl_file.name}")
 
 
-name, authentication_status, username = positive_login(main, "03.09.23")
+name, authentication_status, username = positive_login(main, "06.09.23")
