@@ -1,5 +1,5 @@
 # This code prepares and runs Fine Tuning tor Turbo OpenAi Model
-from mojafunkcija import st_style, positive_login
+from myfunc.mojafunkcija import st_style
 import json
 import os
 import tiktoken
@@ -15,49 +15,13 @@ import time
 # {"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "Who wrote 'Romeo and Juliet'?"}, {"role": "assistant", "content": "Oh, just some guy named William Shakespeare. Ever heard of him?"}]}
 # {"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "How far is the Moon from Earth?"}, {"role": "assistant", "content": "Around 384,400 kilometers. Give or take a few, like that really matters."}]}
 
-
-# Next, we specify the data path and open the JSONL file
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-
-st.set_page_config(
-    page_title="Positive App's",
-    page_icon="👋",
-    layout="wide"
-)
+ft_model = None
 st_style()
 
-ft_model = None
+# Next, we specify the data path and open the JSONL file
 
 
-def main():
-    def intro():
-        st.subheader("Fine Tuning Turbo Modela")
-        with st.expander("Procitajte uputstvo:"):
-            st.caption(
-                "App kreira FT model. Ovde ce ici kompletno uputstvo kako se radi sa svakom opcijom. ")
-
-        with st.sidebar:
-            st.image(
-                "https://test.georgemposi.com/wp-content/uploads/2023/05/positive-logo-red.jpg", width=150)
-            st.success("Select an Action from a Drop Box.")
-
-    page_names_to_funcs = {
-        "Home": intro,
-        "Verify Data": verify_data,
-        "Create FT Model": create_ft_model,
-        "Model list": list_models,
-        "List 10 FT jobs": list_events,
-        "Retrieve the state of a FT": ft_state,
-        "List up to 20 events from a FT job": ft_jobs,
-        "Cancel a job": cancel_job,
-        "Delete FT model": delete_ft_model,
-
-    }
-
-    demo_name = st.sidebar.selectbox("Choose App", page_names_to_funcs.keys(
-    ), help="Odaberite operaciju u vezi FT Modela")
-    page_names_to_funcs[demo_name]()
+        
 
 
 def verify_data():
@@ -174,7 +138,7 @@ def verify_data():
         print_distribution(n_messages, "num_messages_per_example")
         print_distribution(convo_lens, "num_total_tokens_per_example")
         print_distribution(assistant_message_lens,
-                           "num_assistant_tokens_per_example")
+                            "num_assistant_tokens_per_example")
         n_too_long = sum(l > 4096 for l in convo_lens)
         st.info(
             f"\n{n_too_long} examples may be over the 4096 token limit, they will be truncated during fine-tuning")
@@ -205,11 +169,11 @@ def verify_data():
             f"By default, you'll be charged for ~{n_epochs * n_billing_tokens_in_dataset} tokens")
         st.info("See pricing page to estimate total costs")
 
-    ##############################################################################################################
+##############################################################################################################
 
 
 def create_ft_model():
-    # Upload fine tuning data
+# Upload fine tuning data
     data_path = st.file_uploader(
         "Izaberite JSONL fajl za kreiranje FT modela", key="upload_modela", type='JSONL', help="JSONL file sa pitanjima i odgovorima za trening")
 
@@ -260,7 +224,7 @@ def create_ft_model():
 def ft_utils():
 
     ft_model = st.text_input("Unesi ime FT modela ili Job-a: ",
-                             help="U zavisnosti od opcije unesite ime FT modela ili FT Job-a")
+                            help="U zavisnosti od opcije unesite ime FT modela ili FT Job-a")
     if ft_model is None or ft_model == " " or ft_model == "":
         st.info("Unesi ime FT modela")
         return None
@@ -293,6 +257,8 @@ def cancel_job():
             st.error("FT model ne postoji")
     # List up to 10 events from a fine-tuning job
 
+def intro():
+    st.write("Fine Tuning Turbo Modela - odaberite opciju")
 
 def list_events():
     ft_model = ft_utils()
@@ -317,6 +283,29 @@ def delete_ft_model():
 def list_models():
 
     st.code(openai.Model.list())
+    
+def main():
+   
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    
+    with st.sidebar:
+        
+        st.success("Select an Action from a Drop Box.")
+    page_names_to_funcs = {
+            "Into": intro,
+            "Verify Data": verify_data,
+            "Create FT Model": create_ft_model,
+            "Model list": list_models,
+            "List 10 FT jobs": list_events,
+            "Retrieve the state of a FT": ft_state,
+            "List up to 20 events from a FT job": ft_jobs,
+            "Cancel a job": cancel_job,
+            "Delete FT model": delete_ft_model,
+
+        }
+
+    demo_name = st.sidebar.selectbox("Choose App", page_names_to_funcs.keys(
+    ), help="Odaberite operaciju u vezi FT Modela")
+    page_names_to_funcs[demo_name]()
 
 
-name, authentication_status, username = positive_login(main, "06.09.23")
