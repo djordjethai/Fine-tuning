@@ -1,11 +1,11 @@
 import streamlit as st
 st.set_page_config(
     page_title="Fine Tuning",
-    page_icon="👋",
+    page_icon="🏦",
     layout="wide"
     )
 
-from myfunc.mojafunkcija import st_style, positive_login
+from myfunc.mojafunkcija import st_style, positive_login, show_logo
 import Priprema_podataka_za_FT as priprema
 import Fine_Tuning_Turbo as ft
 
@@ -17,9 +17,7 @@ def main():
     if "prip" not in st.session_state:
         st.session_state["prip"] = False 
 
-    with st.sidebar:
-        st.image(
-                "https://test.georgemposi.com/wp-content/uploads/2023/05/positive-logo-red.jpg", width=150)
+    show_logo()
     st.subheader('Izaberite operaciju za Fine Tuning')
 
     with st.expander("Procitajte uputstvo:"):
@@ -56,7 +54,7 @@ def main():
         with ph1.container():
             ft.main()
 
-
+# Korisiti se samo za deployment na streamlit.io
 name, authentication_status, username = positive_login(main, "08.09.23")    
 
 
