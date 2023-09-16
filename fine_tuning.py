@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+
 st.set_page_config(
     page_title="Fine Tuning",
     page_icon="🏦",
@@ -55,6 +57,9 @@ def main():
             ft.main()
 
 # Korisiti se samo za deployment na streamlit.io
-name, authentication_status, username = positive_login(main, "08.09.23")    
+deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
+
+if deployment_environment == "Streamlit":
+    name, authentication_status, username = positive_login(main, "16.09.23.")
 
 
