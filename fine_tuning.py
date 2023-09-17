@@ -56,12 +56,13 @@ def main():
         with ph1.container():
             ft.main()
 
-# Korisiti se samo za deployment na streamlit.io
+# Koristi se samo za deploy na streamlit.io
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
 
 if deployment_environment == "Streamlit":
     name, authentication_status, username = positive_login(main, "16.09.23.")
+else:
+    if __name__ == "__main__":
+        main()
 
-if __name__ == "__main__":
-    main()
 
