@@ -20,13 +20,14 @@ def main():
         st.session_state["prip"] = False 
 
     show_logo()
-    st.subheader('Izaberite operaciju za Fine Tuning')
+    st.subheader('Izaberite operaciju za Fine-Tuning')
 
-    with st.expander("Procitajte uputstvo:"):
-        st.caption("Prethodni korak bio je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Na pitanja mozemo da odgovorimo sami ili se odgovori mogu izvuci iz dokumenta.")
-        st.caption("Ukoliko zelite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponasanja modela) i naziv FT modela. Kliknite na Submit i sacekajte da se obrada zavrsi. Fajl sa odgovorima cete kasnije korisiti za kreiranje FT modela.")
-        st.caption(
-            "Pre prelaska na sledecu fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi. ")
+    with st.expander("Pročitajte uputstvo:"):
+        st.caption("""
+                   Prethodni korak bio je kreiranje pitanja. To smo radili pomoću besplatnog ChatGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo ChatGPT da kreira relevantna pitanja. Na pitanja možemo da odgovorimo sami ili se odgovori mogu izvući iz dokumenta.\n
+                   Ukoliko želite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponašanja modela) i naziv FT modela. Kliknite na Submit i sačekajte da se obrada završi. Fajl sa odgovorima ćete kasnije korisiti za kreiranje FT modela.\n
+                   Pre prelaska na sledeću fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi.
+                   """)
 
     colona1, colona2 = st.columns(2)
 

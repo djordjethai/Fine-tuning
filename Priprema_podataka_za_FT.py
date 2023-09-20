@@ -23,10 +23,10 @@ def pripremaft():
 
     with placeholder.container():
         input_file_path = st.file_uploader(
-            "Izaberite fajl sa pitanjima", key="upload_pitanja", type='txt', help="Pitanja koje ste sastavili u prethodnom koraku.")
+            "Izaberite fajl sa pitanjima", key="upload_pitanja", type='txt', help="Pitanja koja ste sastavili u prethodnom koraku.")
 
         source_file_path = st.file_uploader(
-            "Izaberite fajl sa izvorom (ako postoji)", key="upload_izvor", type='txt', help="Fajl koje zelita da vam bude izvor informacija za odgovore.")
+            "Izaberite fajl sa izvorom (ako postoji)", key="upload_izvor", type='txt', help="Fajl koje želite da vam bude izvor informacija za odgovore.")
 
         if input_file_path is not None:
             # Loading text from the file
@@ -39,7 +39,7 @@ def pripremaft():
             prompt_source = ""
         with st.form(key='my_form'):
             system_message = st.text_area(
-                "Unesite sistemsku poruku: ", help="Opisite ponasanje i stil modela. Ukljucite i ime")
+                "Unesite sistemsku poruku: ", help="Opišite ponašanje i stil modela. Uključite i ime")
             izvor = st.text_input("Unesite naziv FT modela:",
                                 help="Dajte ime modelu koji kreirate")
             output_file_path = f"{izvor}_odg.txt"
@@ -82,7 +82,7 @@ def pripremaft():
 
                 with placeholder.container():
                     st.subheader(
-                        f"Obradjujem {current_question_number}. od ukupno {total_questions} pitanja")
+                        f"Obrađujem {current_question_number}. od ukupno {total_questions} pitanja")
                     st.info(f"Pitanje: {question}")
                     st.success(f"Odgovor: {answer}")
             # Save only answer to the output file
@@ -117,7 +117,7 @@ def pripremaft():
                         jsonl_file.write("\n")
 
                 st.subheader(
-                    f"Obrada je zavrsena, kreiran je fajl {jsonl_file.name}")
+                    f"Obrada je završena, kreiran je fajl {jsonl_file.name}")
 
 
 

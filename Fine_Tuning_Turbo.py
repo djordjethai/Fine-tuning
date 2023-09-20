@@ -38,8 +38,8 @@ def verify_data():
         # We can inspect the data quickly by checking the number of examples and the first item
 
         # Initial dataset stats
-        st.info(f"Num examples: {len(dataset)}")
-        st.info("First example:")
+        st.info(f"Br. primera: {len(dataset)}")
+        st.info("1. primer:")
         for message in dataset[0]["messages"]:
             st.success(message)
 
@@ -77,11 +77,11 @@ def verify_data():
                 format_errors["example_missing_assistant_message"] += 1
 
         if format_errors:
-            st.error("Found errors:")
+            st.error("Nađeni error-i:")
             for k, v in format_errors.items():
                 st.info(f"{k}: {v}")
         else:
-            st.success("No errors found")
+            st.success("Nisu pronađeni error-i")
 
         # Beyond the structure of the message, we also need to ensure that the length does not exceed the 4096 token limit.
 
@@ -107,11 +107,10 @@ def verify_data():
             return num_tokens
 
         def print_distribution(values, name):
-            st.info(f"\n#### Distribution of {name}:")
+            st.info(f"\n#### Distribucija {name}:")
             st.info(f"min / max: {min(values)}, {max(values)}")
             st.info(f"mean / median: {np.mean(values)}, {np.median(values)}")
-            st.info(
-                f"p5 / p95: {np.quantile(values, 0.1)}, {np.quantile(values, 0.9)}")
+            st.info(f"p5 / p95: {np.quantile(values, 0.1)}, {np.quantile(values, 0.9)}")
 
         # Last, we can look at the results of the different formatting operations before proceeding with creating a fine-tuning job:
 
@@ -133,15 +132,15 @@ def verify_data():
             assistant_message_lens.append(
                 num_assistant_tokens_from_messages(messages))
 
-        st.info(f"Num examples missing system message: {n_missing_system}")
-        st.info(f"Num examples missing user message: {n_missing_user}")
+        st.info(f"Br. primera kod kojih fali sistemska poruka: {n_missing_system}")
+        st.info(f"Br. primera kod kojih fali korisnička poruka: {n_missing_user}")
         print_distribution(n_messages, "num_messages_per_example")
         print_distribution(convo_lens, "num_total_tokens_per_example")
         print_distribution(assistant_message_lens,
                             "num_assistant_tokens_per_example")
         n_too_long = sum(l > 4096 for l in convo_lens)
         st.info(
-            f"\n{n_too_long} examples may be over the 4096 token limit, they will be truncated during fine-tuning")
+            f"\n{n_too_long} primera je potencijalno iznad tokenske granice od 4096; biće skraćeni tokom FT.")
 
         # Pricing and default n_epochs estimate
         MAX_TOKENS_PER_EXAMPLE = 4096
@@ -161,16 +160,14 @@ def verify_data():
 
         n_billing_tokens_in_dataset = sum(
             min(MAX_TOKENS_PER_EXAMPLE, length) for length in convo_lens)
-        st.info(
-            f"Dataset has ~{n_billing_tokens_in_dataset} tokens that will be charged for during training")
-        st.info(
-            f"By default, you'll train for {n_epochs} epochs on this dataset")
-        st.info(
-            f"By default, you'll be charged for ~{n_epochs * n_billing_tokens_in_dataset} tokens")
-        st.info("See pricing page to estimate total costs")
+        st.info(f"""
+                Dataset ima ~{n_billing_tokens_in_dataset}, tokena koji će biti naplaćeni tokom treninga.\n
+                Po default-u, trening nad ovim dataset-om će imati {n_epochs} iteraija.\n
+                Po default-u, biće vam naplaćeno ~{n_epochs * n_billing_tokens_in_dataset} tokena [br. iteracija x br. tokena u dataset-u]\n
+                Pogledajte stranicu za naplaćivanje da estimirate ukupne troškove.
+                """)
 
 ##############################################################################################################
-
 
 def create_ft_model():
 # Upload fine tuning data
@@ -188,7 +185,7 @@ def create_ft_model():
             ft_model_validation = ver_path.name
 
             suffix = st.text_input(
-                "Unesi sufiks npr. ime_stila: ", help="Ime modela po kojem cete ga prepoznati")  # suffix name
+                "Unesite sufiks npr. ime_stila: ", help="Ime modela po kojem ćete ga prepoznati")  # suffix name
 
             training_resp = openai.File.create(
                 file=open(izvor, "r", encoding="utf-8"),
@@ -200,8 +197,8 @@ def create_ft_model():
                 purpose='fine-tune'
             )
             validation_file_id = validation_resp.id
-            st.success("Training file id: ", treining_file_id)
-            st.success("Validation file id: ", validation_file_id)
+            st.success("Trening fajl id: ", treining_file_id)
+            st.success("Validacija fajl id: ", validation_file_id)
             time.sleep(30)
             st.info("Please wait... ")
             # openai.organization = "org-77SVjL6mRtS5U57fDU1w1T2z"
@@ -226,7 +223,7 @@ def ft_utils():
     ft_model = st.text_input("Unesi ime FT modela ili Job-a: ",
                             help="U zavisnosti od opcije unesite ime FT modela ili FT Job-a")
     if ft_model is None or ft_model == " " or ft_model == "":
-        st.info("Unesi ime FT modela")
+        st.info("Unesite ime FT modela")
         return None
     else:
         return ft_model
@@ -289,7 +286,6 @@ def main():
     openai.api_key = os.getenv("OPENAI_API_KEY")
     
     with st.sidebar:
-        
         st.success("Select an Action from a Drop Box.")
     page_names_to_funcs = {
             "Into": intro,
@@ -301,10 +297,9 @@ def main():
             "List up to 20 events from a FT job": ft_jobs,
             "Cancel a job": cancel_job,
             "Delete FT model": delete_ft_model,
-
         }
 
-    demo_name = st.sidebar.selectbox("Choose App", page_names_to_funcs.keys(
+    demo_name = st.sidebar.selectbox("Odaberite aplikaciju", page_names_to_funcs.keys(
     ), help="Odaberite operaciju u vezi FT Modela")
     page_names_to_funcs[demo_name]()
 
