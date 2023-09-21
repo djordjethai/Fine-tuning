@@ -6,6 +6,7 @@ st.set_page_config(
     page_icon="🏦",
     layout="wide"
     )
+version = "21.09.23."
 
 from myfunc.mojafunkcija import st_style, positive_login, show_logo
 import Priprema_podataka_za_FT as priprema
@@ -20,6 +21,7 @@ def main():
         st.session_state["prip"] = False 
 
     show_logo()
+    st.markdown(f"<p style='font-size: 10px; color: grey;'>{version}</p>", unsafe_allow_html=True)
     st.subheader('Izaberite operaciju za Fine-Tuning')
 
     with st.expander("Pročitajte uputstvo:"):
