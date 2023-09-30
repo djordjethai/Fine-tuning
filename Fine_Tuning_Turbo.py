@@ -8,6 +8,7 @@ from collections import defaultdict
 import openai
 import streamlit as st
 import time
+import io
 
 
 # Example of fine tuning data
@@ -32,10 +33,16 @@ def verify_data():
     if data_path is not None:
 
         # promeniti ovo u string
-        data_p = data_path.name
+       
         # Load dataset
-        with open(data_p, encoding="utf-8") as f:
-            dataset = [json.loads(line) for line in f]
+        with io.open(data_path.name, "wb") as file:
+                file.write(data_path.getbuffer())
+        
+        dataset = []
+        with io.open(data_path.name, "rb") as file:
+            for line in file:
+                data = json.loads(line)
+                dataset.append(data)
 
         # We can inspect the data quickly by checking the number of examples and the first item
 
@@ -49,6 +56,8 @@ def verify_data():
         # and check to make sure the formatting is correct and matches the Chat completions message structure
 
         # Format error checks
+
+
         format_errors = defaultdict(int)
 
         for ex in dataset:
@@ -57,13 +66,14 @@ def verify_data():
                 continue
 
             messages = ex.get("messages", None)
-            if not messages:
+            if messages is None:
                 format_errors["missing_messages_list"] += 1
                 continue
 
             for message in messages:
-                if "role" not in message or "content" not in message:
+                if not isinstance(message, dict):
                     format_errors["message_missing_key"] += 1
+                    continue
 
                 if any(k not in ("role", "content", "name") for k in message):
                     format_errors["message_unrecognized_key"] += 1
@@ -76,7 +86,12 @@ def verify_data():
                     format_errors["missing_content"] += 1
 
             if not any(message.get("role", None) == "assistant" for message in messages):
-                format_errors["example_missing_assistant_message"] += 1
+                    format_errors["example_missing_assistant_message"] += 1
+
+# Now, format_errors is a defaultdict containing error counts.
+
+
+    
 
         if format_errors:
             st.error("Nađeni error-i:")
@@ -178,47 +193,53 @@ def create_ft_model():
 
     if data_path is not None:
         # promeniti ovo u string
+        with io.open(data_path.name, "wb") as file:
+                file.write(data_path.getbuffer())
         izvor = data_path.name
 
     # training_file validation name
         ver_path = st.file_uploader(
-            "Izaberite JSONL fajl za kreiranje FT modela", key="upload_ver", type='JSONL', help="JSONL file sa pitanjima i odgovorima za verifikaciju")
+            "Izaberite JSONL fajl za validaciju FT modela", key="upload_ver", type='JSONL', help="JSONL file sa pitanjima i odgovorima za verifikaciju")
 
         if ver_path is not None:
+            with io.open(ver_path.name, "wb") as file:
+                file.write(ver_path.getbuffer())
+            izvor = data_path.name
             ft_model_validation = ver_path.name
 
             suffix = st.text_input(
                 "Unesite sufiks npr. ime_stila: ", help="Ime modela po kojem ćete ga prepoznati")  # suffix name
+            if suffix:
+                training_resp = openai.File.create(
+                    file=open(izvor, "r", encoding="utf-8"),
+                    purpose='fine-tune'
+                )
+                treining_file_id = training_resp.id
+                validation_resp = openai.File.create(
+                    file=open(ft_model_validation, "r", encoding="utf-8"),
+                    purpose='fine-tune'
+                )
+                validation_file_id = validation_resp.id
+                st.success(f"Trening fajl id: {treining_file_id}")
+                st.success(f"Validacija fajl id: {validation_file_id}")
+                with st.spinner("Please wait... "):
+                    time.sleep(30)
+                
+                    # openai.organization = "org-77SVjL6mRtS5U57fDU1w1T2z"
 
-            training_resp = openai.File.create(
-                file=open(izvor, "r", encoding="utf-8"),
-                purpose='fine-tune'
-            )
-            treining_file_id = training_resp.id
-            validation_resp = openai.File.create(
-                file=open(ft_model_validation, "r", encoding="utf-8"),
-                purpose='fine-tune'
-            )
-            validation_file_id = validation_resp.id
-            st.success("Trening fajl id: ", treining_file_id)
-            st.success("Validacija fajl id: ", validation_file_id)
-            time.sleep(30)
-            st.info("Please wait... ")
-            # openai.organization = "org-77SVjL6mRtS5U57fDU1w1T2z"
+                    # Creating a model
 
-            # Creating a model
+                    ft_job = openai.FineTuningJob.create(
+                        training_file=treining_file_id,
+                        validation_file=validation_file_id,
+                        model="gpt-3.5-turbo",
+                        suffix=suffix
+                    )
 
-            ft_job = openai.FineTuningJob.create(
-                training_file=treining_file_id,
-                validation_file=validation_file_id,
-                model="gpt-3.5-turbo",
-                suffix=suffix
-            )
-
-            st.info("Fine tuning job id: ", ft_job.id)
-            with open(f"log{suffix}.txt", "w", encoding='utf-8') as output_file:
-                output_file.write(ft_job.id)
-            # additional tasks
+                    st.info("Fine tuning job id: ", ft_job.id)
+                    with open(f"log{suffix}.txt", "w", encoding='utf-8') as output_file:
+                        output_file.write(ft_job.id)
+                    # additional tasks
 
 
 def ft_utils():
@@ -291,7 +312,7 @@ def main():
     with st.sidebar:
         st.success("Select an Action from a Drop Box.")
     page_names_to_funcs = {
-            "Into": intro,
+            "Intro": intro,
             "Verify Data": verify_data,
             "Create FT Model": create_ft_model,
             "Model list": list_models,
