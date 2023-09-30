@@ -95,7 +95,7 @@ def pripremaft():
             with final_placeholder.container():
                 st.subheader(f"Kreiran je fajl {output_file_path}")
                 izv = f"{izvor}.JSONL"
-
+                # promeniti u string
                 # Read user and assistant contents from files
                 with open(input_file_path.name, "r", encoding='utf-8') as user_file:
                     user_contents = user_file.read().splitlines()
@@ -103,6 +103,7 @@ def pripremaft():
                 with open(output_file_path, "r", encoding='utf-8') as assistant_file:
                     assistant_contents = assistant_file.read().splitlines()
 
+                # promeniti u string
                 # Create the JSONL file
                 with open(izv, "w", encoding='utf-8') as jsonl_file:
                     for user_content, assistant_content in zip(user_contents, assistant_contents):

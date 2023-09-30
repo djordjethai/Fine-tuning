@@ -30,6 +30,8 @@ def verify_data():
         "Izaberite JSONL fajl za verifikaciju", key="upload_verifikacije", type='JSONL', help="JSONL file sa pitanjima i odgovorima")
 
     if data_path is not None:
+
+        # promeniti ovo u string
         data_p = data_path.name
         # Load dataset
         with open(data_p, encoding="utf-8") as f:
@@ -175,6 +177,7 @@ def create_ft_model():
         "Izaberite JSONL fajl za kreiranje FT modela", key="upload_modela", type='JSONL', help="JSONL file sa pitanjima i odgovorima za trening")
 
     if data_path is not None:
+        # promeniti ovo u string
         izvor = data_path.name
 
     # training_file validation name
