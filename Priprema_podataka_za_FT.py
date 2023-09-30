@@ -2,6 +2,9 @@ import json
 import openai
 import streamlit as st
 from myfunc.mojafunkcija import open_file, init_cond_llm
+import io
+import re
+from io import StringIO
 
 st.markdown(
     """
@@ -30,10 +33,14 @@ def pripremaft():
 
         if input_file_path is not None:
             # Loading text from the file
+            with io.open(input_file_path.name, "wb") as file:
+                file.write(input_file_path.getbuffer())
             pitanje = open_file(input_file_path.name)
 
         if source_file_path is not None:
             # Loading text from the file
+            with io.open(source_file_path.name, "wb") as file:
+                file.write(source_file_path.getbuffer())
             prompt_source = open_file(source_file_path.name)
         else:
             prompt_source = ""
