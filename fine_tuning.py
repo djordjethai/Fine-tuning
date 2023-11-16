@@ -6,7 +6,7 @@ st.set_page_config(
     page_icon="🏦",
     layout="wide"
     )
-version = "21.09.23."
+version = "16.11.23. OpenAI"
 
 from myfunc.mojafunkcija import st_style, positive_login, show_logo
 import Priprema_podataka_za_FT as priprema
